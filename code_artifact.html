@@ -1,0 +1,1714 @@
+<!DOCTYPE html>
+<html lang="ru" class="scroll-smooth dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>НИЧЕГО™ — Сайт, который абсолютно ни для чего не нужен</title>
+
+  <!-- Подключение кириллических шрифтов Google Fonts: Unbounded, Manrope и JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Unbounded', 'sans-serif'],
+            sans: ['Manrope', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            void: '#05070f',
+            surface: 'rgba(15, 20, 38, 0.55)',
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- Кастомные стили для аура-градиентов, glassmorphism, 3D-эффектов и анимаций -->
+  <style>
+    :root {
+      --bg-void: #05070f;
+      --accent-purple: #8b5cf6;
+      --accent-cyan: #06b6d4;
+      --accent-pink: #ec4899;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      background-color: var(--bg-void);
+      color: #f8fafc;
+      font-family: 'Manrope', sans-serif;
+      overflow-x: hidden;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Тонкая архитектурная сетка на фоне (в стиле Linear) */
+    .bg-grid {
+      background-size: 56px 56px;
+      background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      mask-image: radial-gradient(ellipse 85% 65% at 50% 15%, #000 45%, transparent 100%);
+      -webkit-mask-image: radial-gradient(ellipse 85% 65% at 50% 15%, #000 45%, transparent 100%);
+    }
+
+    /* Плавающие неоновые аура-сферы */
+    @keyframes auroraFloat1 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(6vw, 4vh) scale(1.12); }
+      66% { transform: translate(-4vw, 8vh) scale(0.92); }
+    }
+    @keyframes auroraFloat2 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(-7vw, -5vh) scale(1.15); }
+      66% { transform: translate(5vw, -3vh) scale(0.95); }
+    }
+    @keyframes auroraFloat3 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(4vw, -6vh) scale(1.18); }
+    }
+
+    .aurora-orb-1 {
+      animation: auroraFloat1 18s ease-in-out infinite;
+    }
+    .aurora-orb-2 {
+      animation: auroraFloat2 22s ease-in-out infinite;
+    }
+    .aurora-orb-3 {
+      animation: auroraFloat3 26s ease-in-out infinite;
+    }
+
+    /* Интерактивное свечение за курсором */
+    #cursor-glow {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 520px;
+      height: 520px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1;
+      background: radial-gradient(
+        circle,
+        rgba(139, 92, 246, 0.16) 0%,
+        rgba(6, 182, 212, 0.1) 35%,
+        rgba(236, 72, 153, 0.05) 60%,
+        transparent 72%
+      );
+      transform: translate(-50%, -50%);
+      transition: opacity 0.4s ease;
+      opacity: 0;
+      will-change: transform;
+    }
+
+    /* Стеклянные карточки Glassmorphism + локальное свечение от курсора */
+    .glass-card {
+      position: relative;
+      background: linear-gradient(155deg, rgba(255, 255, 255, 0.065) 0%, rgba(15, 20, 38, 0.52) 100%);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      box-shadow:
+        0 20px 50px -20px rgba(0, 0, 0, 0.75),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+      transform-style: preserve-3d;
+      overflow: hidden;
+    }
+
+    .glass-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        480px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+        rgba(255, 255, 255, 0.09),
+        transparent 45%
+      );
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .glass-card:hover::before {
+      opacity: 1;
+    }
+
+    .glass-card:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+      box-shadow:
+        0 28px 65px -20px rgba(0, 0, 0, 0.85),
+        0 0 35px -10px rgba(139, 92, 246, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    }
+
+    /* Парящая стеклянная шапка */
+    .glass-nav {
+      background: rgba(8, 11, 24, 0.72);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.7);
+    }
+
+    /* Анимированный градиент текста */
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .text-aurora {
+      background: linear-gradient(120deg, #ffffff 0%, #c4b5fd 24%, #22d3ee 52%, #f472b6 78%, #ffffff 100%);
+      background-size: 240% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: gradientShift 7s ease-in-out infinite;
+    }
+
+    /* Главная неоновая кнопка */
+    .neon-cta {
+      position: relative;
+      background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 50%, #ec4899 100%);
+      background-size: 220% 220%;
+      animation: gradientShift 5s ease infinite;
+      box-shadow:
+        0 0 30px rgba(139, 92, 246, 0.5),
+        0 0 65px rgba(6, 182, 212, 0.25),
+        inset 0 1px 1px rgba(255, 255, 255, 0.45);
+      transition: transform 0.15s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease;
+    }
+
+    .neon-cta:hover {
+      transform: translateY(-2px) scale(1.025);
+      box-shadow:
+        0 0 42px rgba(139, 92, 246, 0.72),
+        0 0 85px rgba(236, 72, 153, 0.38),
+        inset 0 1px 2px rgba(255, 255, 255, 0.65);
+    }
+
+    .neon-cta:active {
+      transform: translateY(1px) scale(0.96);
+    }
+
+    .neon-cta::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -120%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+      transform: skewX(-22deg);
+      transition: left 0.65s ease;
+      pointer-events: none;
+    }
+
+    .neon-cta:hover::after {
+      left: 160%;
+    }
+
+    /* Живое переливающееся градиентное полотно в Bento-карточке */
+    .living-gradient {
+      background: linear-gradient(-45deg, #6d28d9, #0891b2, #db2777, #4f46e5, #06b6d4);
+      background-size: 360% 360%;
+      animation: gradientShift 8s ease infinite;
+    }
+
+    /* Неоновая рамка PRO-тарифа */
+    .pro-card-wrapper {
+      position: relative;
+      padding: 1.5px;
+      border-radius: 1.75rem;
+      background: linear-gradient(135deg, #a855f7, #06b6d4, #ec4899, #8b5cf6);
+      background-size: 250% 250%;
+      animation: gradientShift 6s ease infinite;
+      box-shadow: 0 0 55px -12px rgba(139, 92, 246, 0.45);
+    }
+
+    .pro-card-inner {
+      background: linear-gradient(160deg, rgba(16, 20, 42, 0.94) 0%, rgba(7, 10, 22, 0.96) 100%);
+      border-radius: calc(1.75rem - 1.5px);
+      height: 100%;
+    }
+
+    /* Анимация тряски при отказе тумблера */
+    @keyframes shakeHorizontal {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-6px); }
+      40% { transform: translateX(6px); }
+      60% { transform: translateX(-4px); }
+      80% { transform: translateX(4px); }
+    }
+    .animate-shake {
+      animation: shakeHorizontal 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+    }
+
+    /* Вылетающий текст "+5 сек" */
+    @keyframes floatUpFade {
+      0% { opacity: 1; transform: translateY(0) scale(0.95); }
+      100% { opacity: 0; transform: translateY(-34px) scale(1.12); }
+    }
+    .float-plus {
+      animation: floatUpFade 0.9s ease-out forwards;
+    }
+
+    /* Плавное появление секций при прокрутке */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1), transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Тост-уведомление */
+    @keyframes toastIn {
+      0% { opacity: 0; transform: translateY(16px) scale(0.94); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .toast-enter {
+      animation: toastIn 0.32s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    /* Модальное окно */
+    .modal-backdrop {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.28s ease;
+    }
+    .modal-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .modal-panel {
+      transform: scale(0.92) translateY(18px);
+      transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .modal-backdrop.open .modal-panel {
+      transform: scale(1) translateY(0);
+    }
+
+    /* Полноэкранный canvas для неонового конфетти */
+    #confetti-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 60;
+    }
+
+    /* Тонкий скроллбар */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #05070f;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(139, 92, 246, 0.35);
+      border-radius: 999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(6, 182, 212, 0.55);
+    }
+  </style>
+</head>
+
+<body class="relative min-h-screen selection:bg-fuchsia-500/40 selection:text-white">
+  <!-- Глобальное фоновое оформление: аура-градиенты и сетка -->
+  <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden="true">
+    <div class="absolute inset-0 bg-[#05070f]"></div>
+    <div class="absolute inset-0 bg-grid"></div>
+    <!-- Фиолетовая аура -->
+    <div class="aurora-orb-1 absolute -top-36 -left-24 w-[480px] h-[480px] md:w-[680px] md:h-[680px] rounded-full bg-violet-600/25 blur-[130px]"></div>
+    <!-- Бирюзовая аура -->
+    <div class="aurora-orb-2 absolute top-[22%] -right-28 w-[420px] h-[420px] md:w-[620px] md:h-[620px] rounded-full bg-cyan-500/20 blur-[130px]"></div>
+    <!-- Розовая аура -->
+    <div class="aurora-orb-3 absolute -bottom-40 left-[22%] w-[460px] h-[460px] md:w-[660px] md:h-[660px] rounded-full bg-pink-600/20 blur-[140px]"></div>
+  </div>
+
+  <!-- Интерактивное свечение за курсором (только на десктопе) -->
+  <div id="cursor-glow" aria-hidden="true"></div>
+
+  <!-- Полноэкранный Canvas для искр и конфетти -->
+  <canvas id="confetti-canvas" aria-hidden="true"></canvas>
+
+  <!-- ==================== 1. ПАРЯЩАЯ СТЕКЛЯННАЯ ШАПКА ==================== -->
+  <header class="fixed top-3 md:top-5 inset-x-0 z-40 px-3 sm:px-6">
+    <nav class="glass-nav max-w-6xl mx-auto rounded-2xl px-3.5 sm:px-5 py-2.5 sm:py-3 flex items-center justify-between gap-2">
+      <!-- Левая часть: логотип и статус -->
+      <div class="flex items-center gap-2.5 sm:gap-4 min-w-0">
+        <a href="#top" class="flex items-center gap-2.5 group focus:outline-none">
+          <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-violet-500 via-cyan-400 to-pink-500 p-[1.5px] shadow-lg shadow-violet-500/25 group-hover:rotate-12 transition-transform duration-300 shrink-0">
+            <div class="w-full h-full rounded-[10px] bg-[#070a18] flex items-center justify-center">
+              <!-- Геометрический символ пустоты -->
+              <svg class="w-4 h-4 text-cyan-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <circle cx="12" cy="12" r="7.5" />
+                <line x1="5" y1="19" x2="19" y2="5" />
+              </svg>
+            </div>
+          </div>
+          <span class="font-display font-bold text-sm sm:text-base tracking-tight text-white">
+            НИЧЕГО<span class="text-xs align-top text-cyan-400 font-semibold ml-0.5">™</span>
+          </span>
+        </a>
+
+        <!-- Зелёный пульсирующий бейдж статуса -->
+        <div class="hidden sm:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-400/25 text-emerald-300 text-xs font-medium whitespace-nowrap">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+          </span>
+          <span>Статус: 0% пользы</span>
+        </div>
+      </div>
+
+      <!-- Центральная навигация (Desktop) -->
+      <div class="hidden lg:flex items-center gap-1 text-sm font-medium text-slate-300">
+        <a href="#about-void" class="px-3.5 py-2 rounded-xl hover:text-white hover:bg-white/5 transition-colors">О пустоте</a>
+        <a href="#meaning-section" class="px-3.5 py-2 rounded-xl hover:text-white hover:bg-white/5 transition-colors">Смысл</a>
+        <a href="#pricing" class="px-3.5 py-2 rounded-xl hover:text-white hover:bg-white/5 transition-colors">Тарифы</a>
+        <a href="#reviews" class="px-3.5 py-2 rounded-xl hover:text-white hover:bg-white/5 transition-colors">Отзывы</a>
+      </div>
+
+      <!-- Правая часть: звук, кнопка выхода и мобильное меню -->
+      <div class="flex items-center gap-2 shrink-0">
+        <button
+          id="btn-exit"
+          type="button"
+          class="px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-white bg-white/10 hover:bg-white/15 border border-white/15 hover:border-pink-400/50 transition-all active:scale-95 cursor-pointer"
+        >
+          Выйти отсюда
+        </button>
+
+        <!-- Бургер-кнопка для мобильных -->
+        <button
+          id="mobile-menu-btn"
+          type="button"
+          aria-label="Открыть меню"
+          class="lg:hidden p-2 rounded-xl bg-white/5 border border-white/10 text-slate-200 hover:bg-white/10 transition-colors"
+        >
+          <svg id="burger-icon" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h16" />
+          </svg>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Выпадающее мобильное меню -->
+    <div id="mobile-menu" class="hidden lg:hidden max-w-6xl mx-auto mt-2 glass-nav rounded-2xl p-3 space-y-1">
+      <div class="sm:hidden flex items-center gap-2 px-3 py-2 mb-1 rounded-xl bg-emerald-500/10 border border-emerald-400/20 text-emerald-300 text-xs font-medium">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+        </span>
+        <span>Статус: 0% пользы</span>
+      </div>
+      <a href="#about-void" class="mobile-link block px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-white/10">О пустоте</a>
+      <a href="#meaning-section" class="mobile-link block px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-white/10">Смысл</a>
+      <a href="#pricing" class="mobile-link block px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-white/10">Тарифы</a>
+      <a href="#reviews" class="mobile-link block px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-white/10">Отзывы</a>
+    </div>
+  </header>
+
+  <main id="top" class="relative z-10 pt-28 sm:pt-36 pb-16 px-4 sm:px-6">
+
+    <!-- ==================== 2. HERO-СЕКЦИЯ ==================== -->
+    <section class="max-w-5xl mx-auto text-center">
+      <!-- Пафосный стартап-бейдж -->
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.05] border border-white/15 backdrop-blur-md text-xs sm:text-sm text-slate-200 mb-7 shadow-lg shadow-violet-950/30">
+        <span class="px-2 py-0.5 rounded-full bg-gradient-to-r from-violet-500 to-cyan-500 text-[11px] font-bold uppercase tracking-wider text-white">v0.0.0</span>
+        <span class="text-slate-300">Инновационная платформа абсолютного вакуума</span>
+      </div>
+
+      <!-- Крупный градиентный заголовок -->
+      <h1 class="font-display font-extrabold text-3xl sm:text-5xl md:text-6xl lg:text-[4.25rem] leading-[1.12] tracking-tight text-aurora mb-6 px-1">
+        Этот сайт абсолютно ни для чего не нужен
+      </h1>
+
+      <!-- Серьёзный IT-подзаголовок -->
+      <p class="max-w-2xl mx-auto text-base sm:text-lg md:text-xl text-slate-300/90 leading-relaxed font-normal mb-10 sm:mb-12">
+        Мы объединили передовые шейдеры, неоправданно дорогой дизайн и полное отсутствие идеи, чтобы создать цифровой продукт, который
+        <span class="text-white font-semibold">не решает ни одной проблемы</span>,
+        не сэкономит ваше время и не пригодится ни сегодня, ни в обозримом будущем.
+        Зато посмотрите, как красиво переливается фон.
+      </p>
+
+      <!-- ==================== 3. ГЛАВНЫЙ ИНТЕРАКТИВНЫЙ БЛОК ==================== -->
+      <div class="glass-card tilt-card max-w-2xl mx-auto rounded-3xl p-6 sm:p-8 md:p-10 text-center">
+        <div class="relative z-10 flex flex-col items-center">
+          <!-- Шикарная неоновая кнопка -->
+          <button
+            id="btn-nothing"
+            type="button"
+            class="neon-cta overflow-hidden group relative w-full sm:w-auto min-w-[260px] px-8 sm:px-11 py-4 sm:py-5 rounded-2xl font-display font-bold text-base sm:text-lg text-white tracking-wide cursor-pointer select-none focus:outline-none focus:ring-2 focus:ring-cyan-400/70 focus:ring-offset-2 focus:ring-offset-[#05070f]"
+          >
+            <span class="relative z-10 flex items-center justify-center gap-3">
+              <svg class="w-5 h-5 sm:w-6 sm:h-6 transition-transform duration-300 group-hover:rotate-90" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v3m0 12v3m9-9h-3M6 12H3m15.364 6.364l-2.121-2.121M8.757 8.757L6.636 6.636m12.728 0l-2.121 2.121M8.757 15.243l-2.121 2.121" />
+              </svg>
+              <span>Нажать просто так</span>
+            </span>
+          </button>
+
+          <!-- Счётчик бесполезных кликов -->
+          <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
+            <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-xl bg-black/35 border border-white/10">
+              <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Бесполезных кликов:</span>
+              <span id="click-counter" class="font-mono text-lg sm:text-xl font-bold text-cyan-300 tabular-nums">0</span>
+            </div>
+            <div class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-black/35 border border-white/10">
+              <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Польза:</span>
+              <span class="font-mono text-sm sm:text-base font-bold text-pink-400">0.000%</span>
+            </div>
+          </div>
+
+          <!-- Остроумная динамическая фраза -->
+          <div class="mt-5 min-h-[3.25rem] flex items-center justify-center px-2">
+            <p id="click-phrase" class="text-sm sm:text-base text-slate-200 font-medium transition-all duration-300">
+              Нажми кнопку. Обещаем, твоя жизнь не изменится ни на миллиметр.
+            </p>
+          </div>
+
+          <!-- Индикатор "Прогресс достижения смысла" -->
+          <div class="w-full mt-5 pt-5 border-t border-white/10 text-left">
+            <div class="flex items-center justify-between text-xs sm:text-sm mb-2.5">
+              <span class="text-slate-300 font-medium flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-violet-400 animate-pulse"></span>
+                Прогресс достижения смысла
+              </span>
+              <span id="meaning-percent" class="font-mono font-semibold text-cyan-300 tabular-nums">0%</span>
+            </div>
+            <div class="w-full h-3 rounded-full bg-white/[0.07] border border-white/10 overflow-hidden p-[2px]">
+              <div
+                id="meaning-bar"
+                class="h-full rounded-full bg-gradient-to-r from-violet-500 via-cyan-400 to-pink-500 transition-all duration-500 ease-out"
+                style="width: 0%;"
+              ></div>
+            </div>
+            <p id="meaning-hint" class="mt-2 text-xs text-slate-400 font-mono">
+              Ожидание первого бессмысленного импульса...
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Мини-метрики в стиле премиальных лендингов -->
+      <div class="mt-10 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 max-w-3xl mx-auto">
+        <div class="rounded-2xl bg-white/[0.03] border border-white/[0.07] py-3.5 px-3">
+          <div class="font-display font-bold text-lg sm:text-xl text-white">0</div>
+          <div class="text-xs text-slate-400 mt-0.5">Решённых задач</div>
+        </div>
+        <div class="rounded-2xl bg-white/[0.03] border border-white/[0.07] py-3.5 px-3">
+          <div class="font-display font-bold text-lg sm:text-xl text-cyan-300">99.9%</div>
+          <div class="text-xs text-slate-400 mt-0.5">Чистого пафоса</div>
+        </div>
+        <div class="rounded-2xl bg-white/[0.03] border border-white/[0.07] py-3.5 px-3">
+          <div class="font-display font-bold text-lg sm:text-xl text-pink-400">∞</div>
+          <div class="text-xs text-slate-400 mt-0.5">Вопросов «зачем?»</div>
+        </div>
+        <div class="rounded-2xl bg-white/[0.03] border border-white/[0.07] py-3.5 px-3">
+          <div class="font-display font-bold text-lg sm:text-xl text-violet-300">0 ₽</div>
+          <div class="text-xs text-slate-400 mt-0.5">Инвестиций в смысл</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 4. BENTO-СЕТКА (О ПУСТОТЕ И СМЫСЛЕ) ==================== -->
+    <section id="about-void" class="max-w-6xl mx-auto mt-24 sm:mt-32 scroll-mt-28">
+      <div class="text-center max-w-2xl mx-auto mb-12 reveal">
+        <span class="inline-block font-mono text-xs uppercase tracking-[0.2em] text-cyan-400 mb-3">Архитектура пустоты</span>
+        <h2 class="font-display font-bold text-2xl sm:text-4xl text-white tracking-tight">
+          Технологии, которым нет применения
+        </h2>
+        <p class="mt-3 text-slate-400 text-sm sm:text-base">
+          Каждый пиксель этого интерфейса тщательно выверен, чтобы вы получили максимальное эстетическое удовольствие и нулевой результат.
+        </p>
+      </div>
+
+      <!-- Асимметричная 12-колоночная Bento-сетка -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
+
+        <!-- Карточка 1: 0% пользы с графиком, лежащим на нуле -->
+        <div class="glass-card tilt-card reveal lg:col-span-7 rounded-3xl p-6 sm:p-8 flex flex-col justify-between">
+          <div class="relative z-10">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+              <div>
+                <span class="text-xs font-mono uppercase tracking-wider text-violet-300">Аналитика в реальном времени</span>
+                <h3 class="font-display font-bold text-2xl sm:text-3xl text-white mt-1">0% пользы</h3>
+              </div>
+              <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-mono text-slate-300">
+                Стабильность: 100%
+              </span>
+            </div>
+            <p class="text-sm text-slate-400 mb-6">
+              Независимый аудит подтвердил: показатель практической ценности уверенно удерживает исторический минимум на протяжении всех кварталов.
+            </p>
+          </div>
+
+          <!-- Красивый SVG-график, идеально лежащий на нуле -->
+          <div class="relative z-10 rounded-2xl bg-black/40 border border-white/10 p-4 sm:p-5">
+            <div class="flex items-center justify-between text-[11px] font-mono text-slate-500 mb-2">
+              <span>Индекс пользы (%)</span>
+              <span class="text-cyan-400">● Текущее значение: 0.00%</span>
+            </div>
+            <svg viewBox="0 0 500 155" class="w-full h-auto overflow-visible" role="img" aria-label="График пользы на нуле">
+              <defs>
+                <linearGradient id="flatLineGrad" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#8b5cf6" />
+                  <stop offset="50%" stop-color="#06b6d4" />
+                  <stop offset="100%" stop-color="#ec4899" />
+                </linearGradient>
+                <filter id="neonGlow" x="-20%" y="-80%" width="140%" height="260%">
+                  <feGaussianBlur stdDeviation="4" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+
+              <!-- Горизонтальные линии сетки -->
+              <g stroke="rgba(255,255,255,0.07)" stroke-dasharray="4 5" stroke-width="1">
+                <line x1="36" y1="20" x2="485" y2="20" />
+                <line x1="36" y1="55" x2="485" y2="55" />
+                <line x1="36" y1="90" x2="485" y2="90" />
+                <line x1="36" y1="125" x2="485" y2="125" />
+              </g>
+
+              <!-- Ось Y -->
+              <g fill="#64748b" font-family="JetBrains Mono, monospace" font-size="10">
+                <text x="0" y="23">100%</text>
+                <text x="5" y="58">50%</text>
+                <text x="5" y="93">25%</text>
+                <text x="12" y="128" fill="#22d3ee" font-weight="600">0%</text>
+              </g>
+
+              <!-- Идеально прямая неоновая линия на 0% -->
+              <line x1="36" y1="125" x2="485" y2="125" stroke="url(#flatLineGrad)" stroke-width="3.5" stroke-linecap="round" filter="url(#neonGlow)" />
+
+              <!-- Точки данных по месяцам -->
+              <g>
+                <circle cx="55" cy="125" r="4.5" fill="#05070f" stroke="#8b5cf6" stroke-width="2.5" />
+                <circle cx="140" cy="125" r="4.5" fill="#05070f" stroke="#6366f1" stroke-width="2.5" />
+                <circle cx="225" cy="125" r="4.5" fill="#05070f" stroke="#06b6d4" stroke-width="2.5" />
+                <circle cx="310" cy="125" r="4.5" fill="#05070f" stroke="#22d3ee" stroke-width="2.5" />
+                <circle cx="395" cy="125" r="4.5" fill="#05070f" stroke="#c084fc" stroke-width="2.5" />
+                <circle cx="475" cy="125" r="6" fill="#ec4899" stroke="#ffffff" stroke-width="2">
+                  <animate attributeName="r" values="5;7.5;5" dur="2.2s" repeatCount="indefinite" />
+                </circle>
+              </g>
+
+              <!-- Всплывающая подсказка над графиком -->
+              <g transform="translate(310, 44)">
+                <rect x="0" y="0" width="166" height="44" rx="10" fill="rgba(15,23,42,0.92)" stroke="rgba(255,255,255,0.16)" />
+                <text x="12" y="18" fill="#94a3b8" font-family="Manrope, sans-serif" font-size="10">Прогноз на будущее:</text>
+                <text x="12" y="34" fill="#f472b6" font-family="JetBrains Mono, monospace" font-size="11" font-weight="600">Ровно 0% (без роста)</text>
+              </g>
+              <line x1="475" y1="88" x2="475" y2="117" stroke="rgba(236,72,153,0.45)" stroke-dasharray="3 3" />
+
+              <!-- Ось X -->
+              <g fill="#64748b" font-family="JetBrains Mono, monospace" font-size="10" text-anchor="middle">
+                <text x="55" y="148">Вчера</text>
+                <text x="140" y="148">Сегодня</text>
+                <text x="225" y="148">Завтра</text>
+                <text x="310" y="148">2027</text>
+                <text x="395" y="148">2035</text>
+                <text x="475" y="148" fill="#e2e8f0">Никогда</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Карточка 2: 100% красивых градиентов -->
+        <div class="glass-card tilt-card reveal lg:col-span-5 rounded-3xl p-6 sm:p-8 flex flex-col justify-between">
+          <div class="relative z-10">
+            <span class="text-xs font-mono uppercase tracking-wider text-pink-300">Визуальный передоз</span>
+            <h3 class="font-display font-bold text-2xl sm:text-3xl text-white mt-1 leading-snug">
+              100% красивых градиентов
+            </h3>
+            <p class="text-sm text-slate-400 mt-3 mb-6">
+              Весь бюджет разработки ушёл в плавные переливы фиолетового, бирюзового и розового. На функционал денег не осталось (мы и не планировали).
+            </p>
+          </div>
+
+          <!-- Живое градиентное окно с переключателем палитры -->
+          <div class="relative z-10">
+            <div id="gradient-showcase" class="living-gradient relative h-44 sm:h-48 rounded-2xl p-4 flex flex-col justify-between overflow-hidden border border-white/20 shadow-inner">
+              <div class="flex items-center justify-between">
+                <span class="px-2.5 py-1 rounded-lg bg-black/35 backdrop-blur-md text-[11px] font-mono text-white/90">
+                  SHADER: AURA_PRO_MAX
+                </span>
+                <span class="text-xs font-mono text-white/85">60 FPS</span>
+              </div>
+              <div class="flex items-end justify-between gap-2">
+                <div class="text-xs text-white/90 font-medium leading-tight max-w-[65%]">
+                  Невероятно красиво.<br />Абсолютно бессмысленно.
+                </div>
+                <button
+                  id="btn-palette"
+                  type="button"
+                  class="px-3 py-2 rounded-xl bg-black/45 hover:bg-black/65 backdrop-blur-md border border-white/25 text-xs font-semibold text-white transition-all active:scale-95 cursor-pointer shrink-0"
+                >
+                  Сменить вайб
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Карточка 3 (Секция «Смысл»): Интерактивный тумблер «Включить смысл сайта» -->
+        <div id="meaning-section" class="glass-card tilt-card reveal lg:col-span-5 rounded-3xl p-6 sm:p-8 flex flex-col justify-between scroll-mt-28">
+          <div class="relative z-10">
+            <span class="text-xs font-mono uppercase tracking-wider text-cyan-300">Экспериментальная функция</span>
+            <h3 class="font-display font-bold text-xl sm:text-2xl text-white mt-1">
+              Панель управления смыслом
+            </h3>
+            <p class="text-sm text-slate-400 mt-2.5">
+              Попробуйте вручную активировать практическую пользу сайта. Система рассмотрит ваш запрос.
+            </p>
+          </div>
+
+          <div id="toggle-box" class="relative z-10 mt-7 rounded-2xl bg-black/40 border border-white/10 p-5">
+            <div class="flex items-center justify-between gap-4">
+              <div>
+                <div class="font-semibold text-white text-sm sm:text-base">Включить смысл сайта</div>
+                <div id="toggle-state-label" class="text-xs font-mono text-slate-400 mt-0.5">Статус: ВЫКЛ (по умолчанию)</div>
+              </div>
+
+              <!-- Тактильный тумблер в стиле Apple/iOS -->
+              <button
+                id="meaning-toggle"
+                type="button"
+                role="switch"
+                aria-checked="false"
+                aria-label="Включить смысл сайта"
+                class="relative inline-flex h-9 w-16 shrink-0 cursor-pointer rounded-full border border-white/15 bg-slate-800/90 p-1 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-400"
+              >
+                <span
+                  id="meaning-knob"
+                  class="pointer-events-none inline-block h-7 w-7 transform rounded-full bg-white shadow-lg transition-transform duration-300 ease-out translate-x-0"
+                ></span>
+              </button>
+            </div>
+
+            <!-- Сообщение-отказ -->
+            <div id="toggle-feedback" class="mt-4 min-h-[2.75rem] rounded-xl bg-white/[0.04] border border-white/10 px-3.5 py-2.5 text-xs sm:text-sm font-mono text-slate-300 flex items-center gap-2">
+              <span class="text-violet-400 shrink-0">&gt;</span>
+              <span id="toggle-feedback-text">Готов к тщетным попыткам включения.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Карточка 4: Живой таймер потраченного времени + коварная кнопка сброса -->
+        <div class="glass-card tilt-card reveal lg:col-span-7 rounded-3xl p-6 sm:p-8 flex flex-col justify-between">
+          <div class="relative z-10 flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <span class="text-xs font-mono uppercase tracking-wider text-emerald-300">Счётчик упущенных возможностей</span>
+              <h3 class="font-display font-bold text-xl sm:text-2xl text-white mt-1">
+                Вы уже потратили здесь:
+              </h3>
+            </div>
+            <span class="px-3 py-1 rounded-full bg-pink-500/15 border border-pink-400/30 text-pink-300 text-xs font-mono">
+              Возврату не подлежит
+            </span>
+          </div>
+
+          <div class="relative z-10 my-6 flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+            <div>
+              <div class="flex items-baseline gap-2">
+                <span id="wasted-seconds" class="font-display font-extrabold text-4xl sm:text-6xl text-aurora tabular-nums">0</span>
+                <span class="font-display text-lg sm:text-2xl text-slate-300 font-semibold">сек.</span>
+              </div>
+              <p id="timer-roast" class="text-xs sm:text-sm text-slate-400 mt-2">
+                За это время вы могли бы моргнуть. Но вы читаете этот текст.
+              </p>
+            </div>
+
+            <div class="relative shrink-0">
+              <!-- Контейнер для вылетающей надписи +5 сек -->
+              <div id="plus-five-anchor" class="pointer-events-none absolute -top-8 right-4 font-mono font-bold text-pink-400 text-base"></div>
+              <button
+                id="btn-reset-timer"
+                type="button"
+                class="w-full sm:w-auto px-5 py-3.5 rounded-2xl bg-white/[0.08] hover:bg-white/[0.14] border border-white/15 hover:border-cyan-400/50 text-sm font-semibold text-white transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2"
+              >
+                <svg class="w-4 h-4 text-cyan-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span>Сбросить таймер</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="relative z-10 pt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400 font-mono">
+            <span id="timer-penalty-note">Подсказка: кнопка сброса работает в стиле нашего стартапа.</span>
+            <span id="bonus-added-count" class="text-violet-300">Накинуто сверху: 0 сек.</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== 5. СЕКЦИЯ «ТАРИФЫ НА ВОЗДУХ» ==================== -->
+    <section id="pricing" class="max-w-6xl mx-auto mt-24 sm:mt-36 scroll-mt-28">
+      <div class="text-center max-w-2xl mx-auto mb-10 sm:mb-14 reveal">
+        <span class="inline-block font-mono text-xs uppercase tracking-[0.2em] text-pink-400 mb-3">Прозрачная монетизация</span>
+        <h2 class="font-display font-bold text-2xl sm:text-4xl text-white tracking-tight">
+          Тарифы на воздух
+        </h2>
+        <p class="mt-3 text-slate-400 text-sm sm:text-base">
+          Выберите идеальный план для получения абсолютного ничего. Без скрытых платежей и без скрытого смысла.
+        </p>
+
+        <!-- Ироничный переключатель периода оплаты -->
+        <div class="mt-6 inline-flex items-center p-1 rounded-2xl bg-white/[0.05] border border-white/10">
+          <button type="button" data-billing="month" class="billing-tab px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-white/15 text-white transition-all cursor-pointer">
+            Навсегда
+          </button>
+          <button type="button" data-billing="year" class="billing-tab px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-400 hover:text-white transition-all cursor-pointer">
+            На вечность <span class="ml-1 text-[11px] text-emerald-400 font-mono">-0%</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-7 items-stretch">
+
+        <!-- Тариф 1: Базовый -->
+        <div class="glass-card tilt-card reveal rounded-[1.75rem] p-7 sm:p-8 flex flex-col justify-between">
+          <div class="relative z-10">
+            <div class="text-xs font-mono uppercase tracking-wider text-slate-400">Для начинающих</div>
+            <h3 class="font-display font-bold text-2xl text-white mt-1.5">Базовый</h3>
+            <p class="text-sm text-slate-400 mt-2">Идеально, если вы зашли сюда случайно и уже жалеете.</p>
+
+            <div class="mt-6 pb-6 border-b border-white/10">
+              <div class="flex items-baseline gap-2">
+                <span class="font-display font-extrabold text-4xl text-white">0 ₽</span>
+                <span class="billing-period text-sm text-slate-400">/ навсегда</span>
+              </div>
+            </div>
+
+            <ul class="mt-6 space-y-3.5 text-sm text-slate-300">
+              <li class="flex items-start gap-3">
+                <span class="mt-0.5 text-cyan-400">✓</span>
+                <span>Полный круглосуточный доступ к пустоте</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="mt-0.5 text-cyan-400">✓</span>
+                <span>Базовое недоумение при прокрутке</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="mt-0.5 text-cyan-400">✓</span>
+                <span>Ровно 0 полезных функций в комплекте</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="mt-0.5 text-cyan-400">✓</span>
+                <span>Гарантированное отсутствие результата</span>
+              </li>
+            </ul>
+          </div>
+
+          <button
+            type="button"
+            data-plan="Базовый"
+            data-price="0 ₽"
+            class="plan-btn relative z-10 mt-8 w-full py-3.5 px-5 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/15 text-sm font-bold text-white transition-all active:scale-95 cursor-pointer"
+          >
+            Выбрать пустоту
+          </button>
+        </div>
+
+        <!-- Тариф 2: PRO Бесполезность (с неоновой обводкой и бейджем ХИТ) -->
+        <div class="pro-card-wrapper tilt-card reveal relative">
+          <!-- Бейдж ХИТ -->
+          <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 z-20 px-4 py-1 rounded-full bg-gradient-to-r from-violet-500 via-cyan-400 to-pink-500 text-[11px] font-display font-bold uppercase tracking-widest text-white shadow-lg shadow-pink-500/40 whitespace-nowrap">
+            ★ ХИТ ПРОДАЖ
+          </div>
+
+          <div class="pro-card-inner p-7 sm:p-8 flex flex-col justify-between relative overflow-hidden">
+            <div class="absolute -top-24 -right-24 w-48 h-48 rounded-full bg-violet-500/20 blur-3xl pointer-events-none"></div>
+
+            <div class="relative z-10">
+              <div class="text-xs font-mono uppercase tracking-wider text-cyan-300">Выбор эстетов</div>
+              <h3 class="font-display font-bold text-2xl text-white mt-1.5">PRO Бесполезность</h3>
+              <p class="text-sm text-slate-300 mt-2">Для тех, кто хочет тратить время с максимальным премиальным шиком.</p>
+
+              <div class="mt-6 pb-6 border-b border-white/10">
+                <div class="flex items-baseline gap-2">
+                  <span class="font-display font-extrabold text-4xl text-aurora">0 ₽</span>
+                  <span class="billing-period text-sm text-slate-300">/ навсегда</span>
+                </div>
+                <div class="text-xs font-mono text-emerald-400 mt-1">Экономия: 0 ₽ в год</div>
+              </div>
+
+              <ul class="mt-6 space-y-3.5 text-sm text-slate-200">
+                <li class="flex items-start gap-3">
+                  <span class="mt-0.5 text-pink-400">✦</span>
+                  <span>Всё из тарифа «Базовый» (то есть ничего)</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-0.5 text-pink-400">✦</span>
+                  <span>Красивая светящаяся неоновая рамка</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-0.5 text-pink-400">✦</span>
+                  <span>Приоритетное игнорирование ваших запросов</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <span class="mt-0.5 text-pink-400">✦</span>
+                  <span>Чувство лёгкой экзистенциальной абсурдности</span>
+                </li>
+              </ul>
+            </div>
+
+            <button
+              type="button"
+              data-plan="PRO Бесполезность"
+              data-price="0 ₽"
+              class="plan-btn neon-cta relative z-10 mt-8 w-full py-3.5 px-5 rounded-2xl text-sm font-display font-bold text-white cursor-pointer"
+            >
+              Оформить за 0 ₽
+            </button>
+          </div>
+        </div>
+
+        <!-- Тариф 3: Enterprise Пустота -->
+        <div class="glass-card tilt-card reveal rounded-[1.75rem] p-7 sm:p-8 flex flex-col justify-between">
+          <div class="relative z-10">
+            <div class="text-xs font-mono uppercase tracking-wider text-violet-300">Для корпораций</div>
+            <h3 class="font-display font-bold text-2xl text-white mt-1.5">Enterprise Пустота</h3>
+            <p class="text-sm text-slate-400 mt-2">Масштабируемое отсутствие смысла для отделов от 500 прокрастинаторов.</p>
+
+            <div class="mt-6 pb-6 border-b border-white/10">
+              <div class="font-display font-bold text-2xl sm:text-3xl text-white">Договорная</div>
+              <div class="text-xs font-mono text-cyan-300 mt-1">но в итоге всё равно 0 ₽</div>
+            </div>
+
+            <ul class="mt-6 space-y-3.5 text-sm text-slate-300">
+              <li class="flex items-start gap-3">
+                <span class="mt-0.5 text-violet-400">✓</span>
+                <span>Выделенный облачный сервер для хранения ничего</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="mt-0.5 text-violet-400">✓</span>
+                <span>Персональный менеджер, который тоже не понимает, зачем вы здесь</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="mt-0.5 text-violet-400">✓</span>
+                <span>SLA 99.99% гарантии отсутствия пользы</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="mt-0.5 text-violet-400">✓</span>
+                <span>Закрывающие акты на воздух в PDF (не пришлём)</span>
+              </li>
+            </ul>
+          </div>
+
+          <button
+            type="button"
+            data-plan="Enterprise Пустота"
+            data-price="0 ₽ (по договору)"
+            class="plan-btn relative z-10 mt-8 w-full py-3.5 px-5 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/15 text-sm font-bold text-white transition-all active:scale-95 cursor-pointer"
+          >
+            Обсудить ничего
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== 6. СЕКЦИЯ ОТЗЫВОВ ==================== -->
+    <section id="reviews" class="max-w-6xl mx-auto mt-24 sm:mt-36 scroll-mt-28">
+      <div class="text-center max-w-2xl mx-auto mb-12 reveal">
+        <span class="inline-block font-mono text-xs uppercase tracking-[0.2em] text-violet-400 mb-3">Социальное доказательство</span>
+        <h2 class="font-display font-bold text-2xl sm:text-4xl text-white tracking-tight">
+          Что говорят люди, зашедшие сюда случайно
+        </h2>
+        <p class="mt-3 text-slate-400 text-sm sm:text-base">
+          Тысячи пользователей ничего не поняли, но остались в полном восторге от градиентов.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+        <!-- Отзыв 1 -->
+        <article class="glass-card tilt-card reveal rounded-3xl p-6 sm:p-7 flex flex-col justify-between">
+          <div class="relative z-10">
+            <div class="flex items-center gap-1 text-amber-400 text-base mb-4" aria-label="5 из 5 звёзд">
+              ★★★★★
+            </div>
+            <p class="text-slate-200 text-sm sm:text-base leading-relaxed">
+              «Нажал кнопку “Нажать просто так” 42 раза подряд, пока откладывал срочный отчёт. Ничего не произошло, отчёт всё ещё не готов, но искры были шикарные. Однозначно рекомендую!»
+            </p>
+          </div>
+          <div class="relative z-10 mt-6 pt-4 border-t border-white/10 flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-violet-500 to-cyan-400 flex items-center justify-center font-display font-bold text-sm text-white shrink-0">
+              АК
+            </div>
+            <div>
+              <div class="font-bold text-white text-sm">Артём Ковалёв</div>
+              <div class="text-xs text-slate-400">Senior Прокрастинатор</div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Отзыв 2 -->
+        <article class="glass-card tilt-card reveal rounded-3xl p-6 sm:p-7 flex flex-col justify-between">
+          <div class="relative z-10">
+            <div class="flex items-center gap-1 text-amber-400 text-base mb-4" aria-label="5 из 5 звёзд">
+              ★★★★★
+            </div>
+            <p class="text-slate-200 text-sm sm:text-base leading-relaxed">
+              «Пыталась включить смысл сайта 11 раз подряд, потому что была уверена — на двенадцатый тумблер сдастся. Он не сдался. Уважаю такой характер и такой дизайн.»
+            </p>
+          </div>
+          <div class="relative z-10 mt-6 pt-4 border-t border-white/10 flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-pink-500 to-violet-500 flex items-center justify-center font-display font-bold text-sm text-white shrink-0">
+              МВ
+            </div>
+            <div>
+              <div class="font-bold text-white text-sm">Мария Волкова</div>
+              <div class="text-xs text-slate-400">Дизайнер, искавшая референсы</div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Отзыв 3 -->
+        <article class="glass-card tilt-card reveal rounded-3xl p-6 sm:p-7 flex flex-col justify-between">
+          <div class="relative z-10">
+            <div class="flex items-center gap-1 text-amber-400 text-base mb-4" aria-label="5 из 5 звёзд">
+              ★★★★★
+            </div>
+            <p class="text-slate-200 text-sm sm:text-base leading-relaxed">
+              «Подключили всей компанией тариф Enterprise Пустота. Эффективность не выросла, KPI не изменились, зато теперь у нас есть выделенный сервер для хранения ничего. Инвесторы в восторге.»
+            </p>
+          </div>
+          <div class="relative z-10 mt-6 pt-4 border-t border-white/10 flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-cyan-400 to-emerald-400 flex items-center justify-center font-display font-bold text-sm text-slate-950 shrink-0">
+              ДС
+            </div>
+            <div>
+              <div class="font-bold text-white text-sm">Дмитрий Соколов</div>
+              <div class="text-xs text-slate-400">CEO стартапа в вакууме</div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Отзыв 4 -->
+        <article class="glass-card tilt-card reveal rounded-3xl p-6 sm:p-7 flex flex-col justify-between">
+          <div class="relative z-10">
+            <div class="flex items-center gap-1 text-amber-400 text-base mb-4" aria-label="5 из 5 звёзд">
+              ★★★★★
+            </div>
+            <p class="text-slate-200 text-sm sm:text-base leading-relaxed">
+              «Нажал “Сбросить таймер”, чтобы не видеть, сколько времени потратил, а он добавил мне ещё 5 секунд. Гениально. Пойду налью чай и вернусь нажать ещё раз.»
+            </p>
+          </div>
+          <div class="relative z-10 mt-6 pt-4 border-t border-white/10 flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-fuchsia-500 to-amber-400 flex items-center justify-center font-display font-bold text-sm text-white shrink-0">
+              ЕЛ
+            </div>
+            <div>
+              <div class="font-bold text-white text-sm">Елена Лебедева</div>
+              <div class="text-xs text-slate-400">Случайный прохожий из интернета</div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== 7. ЭЛЕГАНТНЫЙ ФУТЕР ==================== -->
+  <footer class="relative z-10 mt-16 border-t border-white/10 bg-black/30 backdrop-blur-xl">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-6">
+      <div class="flex flex-col sm:flex-row items-center gap-3 text-center sm:text-left">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-violet-500 to-cyan-400"></span>
+          <span class="font-display font-bold text-sm text-white">НИЧЕГО™</span>
+        </div>
+        <span class="hidden sm:inline text-slate-600">|</span>
+        <p class="text-xs sm:text-sm text-slate-400">
+          © 2026 Корпорация Ничего. Никакие права не защищены, потому что защищать нечего.
+        </p>
+      </div>
+
+      <button
+        id="btn-back-top"
+        type="button"
+        class="px-5 py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 text-xs sm:text-sm font-semibold text-slate-200 hover:text-white transition-all active:scale-95 cursor-pointer flex items-center gap-2"
+      >
+        <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
+        </svg>
+        <span>Наверх (зачем?)</span>
+      </button>
+    </div>
+  </footer>
+
+  <!-- ==================== МОДАЛЬНОЕ ОКНО ОПЛАТЫ ТАРИФА ==================== -->
+  <div id="payment-modal" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-panel glass-card max-w-md w-full rounded-3xl p-6 sm:p-8 text-center border border-white/20">
+      <div class="relative z-10">
+        <!-- Иконка успешной бессмысленности -->
+        <div class="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500 via-cyan-400 to-pink-500 p-[2px] mb-5 shadow-lg shadow-cyan-500/30">
+          <div class="w-full h-full rounded-[14px] bg-[#090d1f] flex items-center justify-center">
+            <svg class="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+        </div>
+
+        <span class="inline-block px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 text-xs font-mono mb-3">
+          ТРАНЗАКЦИЯ #000000
+        </span>
+
+        <h3 id="modal-title" class="font-display font-bold text-xl sm:text-2xl text-white">
+          Оплата прошла бессмысленно
+        </h3>
+
+        <p id="modal-desc" class="mt-3 text-sm sm:text-base text-slate-300 leading-relaxed">
+          Вы ничего не купили и ничего не получили.
+        </p>
+
+        <!-- Ироничный чек -->
+        <div class="mt-5 rounded-2xl bg-black/45 border border-white/10 p-4 text-left font-mono text-xs space-y-2 text-slate-300">
+          <div class="flex justify-between">
+            <span class="text-slate-500">Тариф:</span>
+            <span id="modal-plan-name" class="text-cyan-300 font-semibold">PRO Бесполезность</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-500">Списано:</span>
+            <span id="modal-plan-price" class="text-white">0 ₽</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-500">Получено пользы:</span>
+            <span class="text-pink-400">0 ед.</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-500">Чек отправлен:</span>
+            <span class="text-slate-400">в никуда</span>
+          </div>
+        </div>
+
+        <button
+          id="modal-close-btn"
+          type="button"
+          class="neon-cta mt-6 w-full py-3.5 px-6 rounded-2xl font-display font-bold text-sm text-white cursor-pointer"
+        >
+          Осознать и закрыть
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Контейнер для всплывающих тост-уведомлений -->
+  <div id="toast-container" class="fixed bottom-4 right-4 left-4 sm:left-auto sm:w-96 z-50 flex flex-col gap-2.5 pointer-events-none"></div>
+
+  <!-- ==================== JAVASCRIPT: ИНТЕРАКТИВ, КОНФЕТТИ, АНИМАЦИИ ==================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      /* ----------------------------------------------------------------
+         1. Мягкие синтезированные звуки через Web Audio API (без URL)
+      ---------------------------------------------------------------- */
+      let audioCtx = null;
+      function playTone(freq, duration, type = 'sine', volume = 0.05) {
+        try {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (!AudioContextClass) return;
+          if (!audioCtx) audioCtx = new AudioContextClass();
+          if (audioCtx.state === 'suspended') audioCtx.resume();
+
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(freq * 1.35, audioCtx.currentTime + duration);
+
+          gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + duration);
+        } catch (e) {
+          // Игнорируем ограничения браузера на звук
+        }
+      }
+
+      /* ----------------------------------------------------------------
+         2. Система тост-уведомлений (вместо alert)
+      ---------------------------------------------------------------- */
+      const toastContainer = document.getElementById('toast-container');
+
+      function showToast(title, message, accent = 'cyan') {
+        const colors = {
+          cyan: 'border-cyan-400/35 text-cyan-300',
+          pink: 'border-pink-400/35 text-pink-300',
+          violet: 'border-violet-400/35 text-violet-300',
+          emerald: 'border-emerald-400/35 text-emerald-300',
+        };
+        const badgeStyle = colors[accent] || colors.cyan;
+
+        const toast = document.createElement('div');
+        toast.className = `toast-enter pointer-events-auto rounded-2xl bg-[#0c1024]/92 backdrop-blur-xl border ${badgeStyle.split(' ')[0]} p-4 shadow-2xl shadow-black/70 flex items-start gap-3`;
+        toast.innerHTML = `
+          <div class="mt-0.5 text-lg leading-none select-none">✦</div>
+          <div class="flex-1 min-w-0">
+            <div class="text-xs font-mono uppercase tracking-wider font-semibold ${badgeStyle.split(' ')[1]}">${title}</div>
+            <div class="text-sm text-slate-100 mt-0.5 leading-snug">${message}</div>
+          </div>
+        `;
+
+        // Ограничиваем стек до 3 видимых тостов
+        while (toastContainer.children.length >= 3) {
+          toastContainer.firstElementChild.remove();
+        }
+        toastContainer.appendChild(toast);
+
+        setTimeout(() => {
+          toast.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+          toast.style.opacity = '0';
+          toast.style.transform = 'translateY(10px) scale(0.95)';
+          setTimeout(() => toast.remove(), 320);
+        }, 3800);
+      }
+
+      /* ----------------------------------------------------------------
+         3. Полноэкранный Canvas с неоновыми искрами и конфетти
+      ---------------------------------------------------------------- */
+      const canvas = document.getElementById('confetti-canvas');
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      let dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+      function resizeCanvas() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = window.innerWidth * dpr;
+        canvas.height = window.innerHeight * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      const NEON_COLORS = ['#a855f7', '#06b6d4', '#ec4899', '#38bdf8', '#f472b6', '#c084fc', '#ffffff', '#34d399'];
+
+      function spawnSparks(x, y, count = 34, power = 1) {
+        for (let i = 0; i < count; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const speed = (2.2 + Math.random() * 7.5) * power;
+          const isRibbon = Math.random() > 0.45;
+          particles.push({
+            x,
+            y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed - (2.4 * power),
+            gravity: 0.17 + Math.random() * 0.08,
+            drag: 0.975,
+            color: NEON_COLORS[Math.floor(Math.random() * NEON_COLORS.length)],
+            size: isRibbon ? 4 + Math.random() * 5 : 2 + Math.random() * 3,
+            isRibbon,
+            rotation: Math.random() * Math.PI * 2,
+            rotSpeed: (Math.random() - 0.5) * 0.24,
+            alpha: 1,
+            decay: 0.012 + Math.random() * 0.012,
+          });
+        }
+      }
+
+      function launchBigFirework() {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        spawnSparks(w * 0.25, h * 0.38, 45, 1.25);
+        setTimeout(() => spawnSparks(w * 0.75, h * 0.34, 45, 1.25), 140);
+        setTimeout(() => spawnSparks(w * 0.5, h * 0.26, 65, 1.4), 280);
+      }
+
+      function animateCanvas() {
+        ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const p = particles[i];
+          p.vx *= p.drag;
+          p.vy *= p.drag;
+          p.vy += p.gravity;
+          p.x += p.vx;
+          p.y += p.vy;
+          p.rotation += p.rotSpeed;
+          p.alpha -= p.decay;
+
+          if (p.alpha <= 0) {
+            particles.splice(i, 1);
+            continue;
+          }
+
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, p.alpha);
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rotation);
+          ctx.fillStyle = p.color;
+          ctx.shadowColor = p.color;
+          ctx.shadowBlur = 10;
+
+          if (p.isRibbon) {
+            ctx.fillRect(-p.size, -p.size * 0.4, p.size * 2, p.size * 0.8);
+          } else {
+            ctx.beginPath();
+            ctx.arc(0, 0, p.size, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.restore();
+        }
+
+        requestAnimationFrame(animateCanvas);
+      }
+
+      /* ----------------------------------------------------------------
+         4. Интерактивное свечение за курсором и лёгкий 3D-наклон карточек
+      ---------------------------------------------------------------- */
+      const cursorGlow = document.getElementById('cursor-glow');
+      const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
+
+      if (!isTouchDevice && cursorGlow) {
+        let glowVisible = false;
+        window.addEventListener('mousemove', (e) => {
+          if (!glowVisible) {
+            cursorGlow.style.opacity = '1';
+            glowVisible = true;
+          }
+          cursorGlow.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
+        }, { passive: true });
+
+        document.addEventListener('mouseleave', () => {
+          cursorGlow.style.opacity = '0';
+          glowVisible = false;
+        });
+
+        // 3D-наклон и локальная подсветка на стеклянных карточках
+        document.querySelectorAll('.tilt-card').forEach((card) => {
+          card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            card.style.setProperty('--mouse-x', `${x}px`);
+            card.style.setProperty('--mouse-y', `${y}px`);
+
+            const rotateY = ((x / rect.width) - 0.5) * 6;
+            const rotateX = ((y / rect.height) - 0.5) * -6;
+            card.style.transform = `perspective(900px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-2px)`;
+          });
+
+          card.addEventListener('mouseleave', () => {
+            card.style.transform = 'perspective(900px) rotateX(0deg) rotateY(0deg) translateY(0px)';
+          });
+        });
+      }
+
+      /* ----------------------------------------------------------------
+         5. Мобильное меню и кнопка «Выйти отсюда»
+      ---------------------------------------------------------------- */
+      const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+      const mobileMenu = document.getElementById('mobile-menu');
+      mobileMenuBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+      });
+      document.querySelectorAll('.mobile-link').forEach((link) => {
+        link.addEventListener('click', () => mobileMenu.classList.add('hidden'));
+      });
+
+      const exitMessages = [
+        'Крестик вон там, в углу браузера, я за тебя закрывать не буду.',
+        'Серьёзно, просто закрой вкладку. Я не держу (но градиенты держат).',
+        'Кнопка выхода тоже бесполезна. Ты ожидал другого?',
+        'Попытка побега зафиксирована. Оставь ещё пару кликов и свободен.',
+      ];
+      let exitClicks = 0;
+      document.getElementById('btn-exit').addEventListener('click', () => {
+        playTone(320, 0.14, 'triangle', 0.04);
+        showToast('Отказ в выходе', exitMessages[exitClicks % exitMessages.length], 'pink');
+        exitClicks++;
+      });
+
+      /* ----------------------------------------------------------------
+         6. Главная кнопка «Нажать просто так» + Прогресс смысла
+      ---------------------------------------------------------------- */
+      const btnNothing = document.getElementById('btn-nothing');
+      const clickCounterEl = document.getElementById('click-counter');
+      const clickPhraseEl = document.getElementById('click-phrase');
+      const meaningBar = document.getElementById('meaning-bar');
+      const meaningPercentEl = document.getElementById('meaning-percent');
+      const meaningHintEl = document.getElementById('meaning-hint');
+
+      let clickCount = 0;
+      let progressStep = 0;
+
+      // Вехи с остроумными фразами и тостами
+      const milestones = {
+        1: {
+          phrase: 'Поздравляем, ничего не произошло.',
+          toast: ['Клик #1', 'Официально: ничего не произошло. Красиво, правда?', 'cyan'],
+        },
+        3: {
+          phrase: 'Отлично, ты всё ещё тратишь время. Продолжаем наблюдение.',
+          toast: ['Клик #3', 'Три нажатия подряд — это уже осознанный выбор пустоты.', 'violet'],
+        },
+        5: {
+          phrase: 'Пять кликов! Получай невидимую медаль за упорство.',
+          toast: ['Достижение разблокировано', '«Мастер ничегонеделания I степени»', 'emerald'],
+        },
+        10: {
+          phrase: 'Десять нажатий. Ты уверен, что у тебя нет более важных дел?',
+          toast: ['Клик #10', 'Сервер успешно обработал 10 порций пустоты.', 'pink'],
+        },
+        15: {
+          phrase: 'На 20-й раз точно появится секрет (нет).',
+          toast: ['Инсайдерская информация', 'Спойлер: на 20-й раз тоже ничего не будет.', 'violet'],
+        },
+        20: {
+          phrase: 'Сюрприз! Секрета действительно нет. Мы же предупреждали.',
+          toast: ['Клик #20', 'Ты проверил. Теперь ты знаешь правду.', 'pink'],
+        },
+        25: {
+          phrase: 'Ладно, держи салют, но пользы всё равно ноль.',
+          toast: ['Праздничный салют!', 'Двадцать пять кликов! Салют есть, смысла нет.', 'cyan'],
+          firework: true,
+        },
+        35: {
+          phrase: 'Твой палец заслуживает отпуск. Кнопка — тоже.',
+          toast: ['Клик #35', 'Уровень вовлечённости в пустоту критический.', 'violet'],
+        },
+        50: {
+          phrase: 'ПЯТЬДЕСЯТ! Это легендарный уровень прокрастинации. Салют в твою честь!',
+          toast: ['Легенда пустоты (50 кликов)', 'Ладно, держи королевский салют, но пользы всё равно ноль!', 'emerald'],
+          firework: true,
+        },
+        75: {
+          phrase: '75 кликов... Может, пора закрыть вкладку? (Нет, жми до сотки)',
+          toast: ['Клик #75', 'До сотни всего 25 бесполезных нажатий.', 'pink'],
+        },
+        100: {
+          phrase: '100 кликов! Ты прошёл сайт, который невозможно пройти. Браво!',
+          toast: ['Финал без финала!', '100 кликов! Ты официально почётный амбассадор НИЧЕГО™.', 'cyan'],
+          firework: true,
+        },
+      };
+
+      const fillerPhrases = [
+        'Искры полетели. Смысл — нет.',
+        'Ещё один элегантный клик в копилку вечности.',
+        'Система подтверждает: по-прежнему бесполезно.',
+        'Красиво нажал. Солидно. Бессмысленно.',
+        'Мы передали этот клик в отдел пустоты.',
+        'Кнопка чувствует себя нужной, хотя она не нужна.',
+        'Ни один алгоритм не пострадал. Потому что его тут нет.',
+      ];
+
+      // Логика полосы «Прогресс достижения смысла» (застревает на 99% и сбрасывается)
+      const progressSequence = [
+        { val: 18, label: '18%', hint: 'Поиск смысла в кэше браузера...' },
+        { val: 42, label: '42%', hint: 'Ответ на главный вопрос жизни почти найден...' },
+        { val: 67, label: '67%', hint: 'Компиляция несуществующих нейросетей...' },
+        { val: 89, label: '89%', hint: 'Осталось совсем чуть-чуть до озарения...' },
+        { val: 99, label: '99%', hint: 'Почти готово! Ещё один клик...' },
+        { val: 99, label: '99.9%', hint: 'Загружаем последние 0.1% смысла...' },
+        { val: 99, label: '99.99%', hint: 'Подожди, оно застряло на краю бездны...' },
+        { val: 0, label: '0%', hint: 'Ой, смысл выветрился. Всё сбросилось. Попробуй снова (не надо).' },
+      ];
+
+      btnNothing.addEventListener('click', (e) => {
+        clickCount++;
+        clickCounterEl.textContent = clickCount;
+
+        // Координаты взрыва искр прямо из места нажатия или центра кнопки
+        const rect = btnNothing.getBoundingClientRect();
+        const originX = e.clientX || (rect.left + rect.width / 2);
+        const originY = e.clientY || (rect.top + rect.height / 2);
+        spawnSparks(originX, originY, 36, 1.05);
+        playTone(460 + (clickCount % 8) * 55, 0.12, 'sine', 0.045);
+
+        // Обновление фразы и проверка вех
+        if (milestones[clickCount]) {
+          const m = milestones[clickCount];
+          clickPhraseEl.textContent = m.phrase;
+          showToast(m.toast[0], m.toast[1], m.toast[2]);
+          if (m.firework) launchBigFirework();
+        } else {
+          clickPhraseEl.textContent = fillerPhrases[clickCount % fillerPhrases.length];
+        }
+
+        // Обновление полосы «Прогресс достижения смысла»
+        const stepData = progressSequence[progressStep % progressSequence.length];
+        meaningBar.style.width = `${stepData.val}%`;
+        meaningPercentEl.textContent = stepData.label;
+        meaningHintEl.textContent = stepData.hint;
+
+        if (stepData.val === 0) {
+          meaningPercentEl.classList.remove('text-cyan-300');
+          meaningPercentEl.classList.add('text-pink-400');
+          playTone(210, 0.22, 'sawtooth', 0.03);
+        } else {
+          meaningPercentEl.classList.remove('text-pink-400');
+          meaningPercentEl.classList.add('text-cyan-300');
+        }
+        progressStep++;
+      });
+
+      /* ----------------------------------------------------------------
+         7. Карточка градиентов: кнопка «Сменить вайб»
+      ---------------------------------------------------------------- */
+      const gradientShowcase = document.getElementById('gradient-showcase');
+      const palettes = [
+        'linear-gradient(-45deg, #6d28d9, #0891b2, #db2777, #4f46e5, #06b6d4)',
+        'linear-gradient(-45deg, #ec4899, #8b5cf6, #f59e0b, #06b6d4, #d946ef)',
+        'linear-gradient(-45deg, #10b981, #06b6d4, #6366f1, #8b5cf6, #14b8a6)',
+        'linear-gradient(-45deg, #f43f5e, #a855f7, #3b82f6, #22d3ee, #ec4899)',
+      ];
+      let paletteIdx = 0;
+
+      document.getElementById('btn-palette').addEventListener('click', () => {
+        paletteIdx = (paletteIdx + 1) % palettes.length;
+        gradientShowcase.style.backgroundImage = palettes[paletteIdx];
+        playTone(540 + paletteIdx * 60, 0.1, 'sine', 0.035);
+        showToast('Вайб обновлён', 'Оттенок пустоты стал ещё дороже. Польза не изменилась.', 'violet');
+      });
+
+      /* ----------------------------------------------------------------
+         8. Интерактивный тумблер «Включить смысл сайта»
+      ---------------------------------------------------------------- */
+      const meaningToggle = document.getElementById('meaning-toggle');
+      const meaningKnob = document.getElementById('meaning-knob');
+      const toggleStateLabel = document.getElementById('toggle-state-label');
+      const toggleFeedbackText = document.getElementById('toggle-feedback-text');
+      const toggleBox = document.getElementById('toggle-box');
+
+      const sarcasticErrors = [
+        'Ошибка 404: смысл не обнаружен.',
+        'Не трогай, оно так задумано.',
+        'Попытка придать сайту пользу заблокирована.',
+        'Отказано: обнаружен опасный уровень серьёзности.',
+        'Ядро пустоты отклонило запрос. Попробуйте никогда.',
+        'Даже не надейся, тумблер сильнее тебя.',
+      ];
+      let toggleAttempts = 0;
+      let toggleBusy = false;
+
+      meaningToggle.addEventListener('click', () => {
+        if (toggleBusy) return;
+        toggleBusy = true;
+
+        // Переводим в состояние ВКЛ
+        meaningToggle.setAttribute('aria-checked', 'true');
+        meaningToggle.classList.remove('bg-slate-800/90');
+        meaningToggle.classList.add('bg-gradient-to-r', 'from-violet-500', 'to-cyan-400');
+        meaningKnob.style.transform = 'translateX(28px)';
+        toggleStateLabel.textContent = 'Статус: Поиск смысла...';
+        toggleStateLabel.classList.replace('text-slate-400', 'text-cyan-300');
+        toggleFeedbackText.textContent = 'Загрузка практической пользы...';
+        playTone(580, 0.09, 'sine', 0.04);
+
+        // Через 520 мс эффектно щёлкаем обратно в ВЫКЛ
+        setTimeout(() => {
+          meaningToggle.setAttribute('aria-checked', 'false');
+          meaningToggle.classList.remove('bg-gradient-to-r', 'from-violet-500', 'to-cyan-400');
+          meaningToggle.classList.add('bg-slate-800/90');
+          meaningKnob.style.transform = 'translateX(0px)';
+
+          const errMsg = sarcasticErrors[toggleAttempts % sarcasticErrors.length];
+          toggleAttempts++;
+
+          toggleStateLabel.textContent = 'Статус: ВЫКЛ (защита сработала)';
+          toggleStateLabel.classList.replace('text-cyan-300', 'text-pink-400');
+          toggleFeedbackText.textContent = errMsg;
+
+          toggleBox.classList.remove('animate-shake');
+          void toggleBox.offsetWidth; // принудительный reflow для повторной анимации
+          toggleBox.classList.add('animate-shake');
+
+          playTone(195, 0.16, 'triangle', 0.05);
+          showToast('Сбой смысла', errMsg, 'pink');
+
+          setTimeout(() => {
+            toggleStateLabel.classList.replace('text-pink-400', 'text-slate-400');
+            toggleBusy = false;
+          }, 300);
+        }, 520);
+      });
+
+      /* ----------------------------------------------------------------
+         9. Живой таймер потраченного времени + кнопка «Сбросить таймер» (+5 сек)
+      ---------------------------------------------------------------- */
+      const wastedSecondsEl = document.getElementById('wasted-seconds');
+      const timerRoastEl = document.getElementById('timer-roast');
+      const btnResetTimer = document.getElementById('btn-reset-timer');
+      const plusFiveAnchor = document.getElementById('plus-five-anchor');
+      const timerPenaltyNote = document.getElementById('timer-penalty-note');
+      const bonusAddedCountEl = document.getElementById('bonus-added-count');
+
+      let wastedSeconds = 0;
+      let penaltyTotal = 0;
+
+      const timerRoasts = [
+        { min: 0, text: 'За это время вы могли бы моргнуть. Но вы читаете этот текст.' },
+        { min: 15, text: 'Прошло 15 секунд. Можно было выпить глоток воды, но градиент важнее.' },
+        { min: 35, text: 'Уже больше полминуты. Поздравляем с инвестицией в абсолютный ноль.' },
+        { min: 60, text: 'Целая минута! Вы официально самый преданный фанат пустоты.' },
+        { min: 120, text: 'Две минуты здесь... Вам точно не пора поработать?' },
+        { min: 300, text: 'Пять минут! Мы начинаем за вас переживать (но совсем чуть-чуть).' },
+      ];
+
+      function updateTimerDisplay() {
+        wastedSecondsEl.textContent = wastedSeconds;
+        let currentRoast = timerRoasts[0].text;
+        for (const r of timerRoasts) {
+          if (wastedSeconds >= r.min) currentRoast = r.text;
+        }
+        timerRoastEl.textContent = currentRoast;
+      }
+
+      setInterval(() => {
+        wastedSeconds++;
+        updateTimerDisplay();
+      }, 1000);
+
+      const penaltyJokes = [
+        'Ой, кнопка сброса случайно добавила ещё +5 секунд.',
+        'Время назад не вернуть! Мы просто накинули +5 сек сверху.',
+        'Штраф за попытку обнулить прошлое: держи ещё +5 секунд.',
+        'Интересный факт: каждое нажатие делает таймер только больше.',
+      ];
+      let penaltyClicks = 0;
+
+      btnResetTimer.addEventListener('click', () => {
+        wastedSeconds += 5;
+        penaltyTotal += 5;
+        updateTimerDisplay();
+
+        bonusAddedCountEl.textContent = `Накинуто сверху: ${penaltyTotal} сек.`;
+        const joke = penaltyJokes[penaltyClicks % penaltyJokes.length];
+        timerPenaltyNote.textContent = joke;
+        penaltyClicks++;
+
+        // Летающий эффект "+5 сек"
+        const badge = document.createElement('span');
+        badge.className = 'float-plus inline-block';
+        badge.textContent = '+5 сек!';
+        plusFiveAnchor.innerHTML = '';
+        plusFiveAnchor.appendChild(badge);
+
+        playTone(390, 0.12, 'triangle', 0.045);
+        showToast('Сброс не удался', joke, 'violet');
+      });
+
+      /* ----------------------------------------------------------------
+         10. Тарифы на воздух: переключатель и модальное окно оплаты
+      ---------------------------------------------------------------- */
+      const billingTabs = document.querySelectorAll('.billing-tab');
+      const billingPeriods = document.querySelectorAll('.billing-period');
+
+      billingTabs.forEach((tab) => {
+        tab.addEventListener('click', () => {
+          billingTabs.forEach((t) => {
+            t.classList.remove('bg-white/15', 'text-white');
+            t.classList.add('text-slate-400');
+          });
+          tab.classList.add('bg-white/15', 'text-white');
+          tab.classList.remove('text-slate-400');
+
+          const isYear = tab.dataset.billing === 'year';
+          billingPeriods.forEach((el) => {
+            el.textContent = isYear ? '/ на вечность' : '/ навсегда';
+          });
+          playTone(500, 0.08, 'sine', 0.03);
+        });
+      });
+
+      const paymentModal = document.getElementById('payment-modal');
+      const modalPlanName = document.getElementById('modal-plan-name');
+      const modalPlanPrice = document.getElementById('modal-plan-price');
+      const modalDesc = document.getElementById('modal-desc');
+      const modalCloseBtn = document.getElementById('modal-close-btn');
+
+      function openPaymentModal(plan, price) {
+        modalPlanName.textContent = plan;
+        modalPlanPrice.textContent = price;
+        modalDesc.textContent = `Вы успешно оформили тариф «${plan}». Вы ничего не купили и ничего не получили. Добро пожаловать в элитный клуб пустоты!`;
+        paymentModal.classList.add('open');
+        document.body.style.overflow = 'hidden';
+
+        playTone(620, 0.14, 'sine', 0.045);
+        spawnSparks(window.innerWidth / 2, window.innerHeight / 2, 48, 1.15);
+      }
+
+      function closePaymentModal() {
+        paymentModal.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+
+      document.querySelectorAll('.plan-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          openPaymentModal(btn.dataset.plan, btn.dataset.price);
+        });
+      });
+
+      modalCloseBtn.addEventListener('click', closePaymentModal);
+      paymentModal.addEventListener('click', (e) => {
+        if (e.target === paymentModal) closePaymentModal();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && paymentModal.classList.contains('open')) {
+          closePaymentModal();
+        }
+      });
+
+      /* ----------------------------------------------------------------
+         11. Кнопка «Наверх (зачем?)» и плавное появление при скролле
+      ---------------------------------------------------------------- */
+      document.getElementById('btn-back-top').addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        playTone(520, 0.1, 'sine', 0.035);
+        showToast('Телепортация в начало', 'Возвращаем тебя туда, где тоже нет никакого смысла.', 'cyan');
+      });
+
+      const revealObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              revealObserver.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.12 }
+      );
+      document.querySelectorAll('.reveal').forEach((el) => revealObserver.observe(el));
+
+      /* ----------------------------------------------------------------
+         12. Инициализация canvas после загрузки окна
+      ---------------------------------------------------------------- */
+      window.addEventListener('resize', resizeCanvas, { passive: true });
+      window.onload = function () {
+        resizeCanvas();
+        animateCanvas();
+      };
+    })();
+  </script>
+</body>
+</html>
